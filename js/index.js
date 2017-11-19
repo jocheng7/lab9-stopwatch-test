@@ -302,7 +302,7 @@ var RegisterLogin = function RegisterLogin(props) {
           whitesp1,
           '  ',
           whitesp1,
-          ' Paaword:  ',
+          ' Password:  ',
           whitesp1,
           React.createElement('input', { type: 'password', name: 'psw', onChange: props.action, value: props.psw, required: true, pattern: '.{6,}' })
         ),
