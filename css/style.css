@@ -1,0 +1,40 @@
+.makeItRed {  
+  color:red;
+}
+
+import url(
+https://fonts.googleapis.com/css?family=Roboto:400, 500)
+
+html{
+    font-family: 'Roboto';
+}
+
+*{
+  /* golden rules */
+  box-sizing: border-box; 
+  margin: 0;
+}
+
+.container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%
+}
+
+.innerContent{
+  border: 8px solid grey;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: #C2C5BB;
+  /* background-image: url("http://www.coffeeforless.com/media/catalog/product/images/uploads/plastic.jpg"); */ 
+
+}
+
+h4{
+  padding: 0.8em;
+  
+}

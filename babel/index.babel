@@ -1,0 +1,583 @@
+
+///   experiment with top level api
+
+const styled = styled.default;
+
+//========
+
+
+const MAINTEXT ={
+  TEXTSIZE: .9
+}
+
+const StyledButton = styled.button`
+  max-width: 150px;
+  border: 0.4em solid tan;
+  border-radius: 1.1em;
+  padding: 25px;
+  font-size: ${MAINTEXT.TEXTSIZE}em;
+  background: green;
+  color: white;
+  outline: none;
+  flex-direction: row;
+  align-items: center;
+  justify-content: left;
+`
+const StyledH5 = styled.h5`
+  border: 2px;
+  padding: 1.0px 2.0px 0.42em 2.0em;
+  background: yellow;
+`
+
+const StyledMeun5 = styled.menu`
+  border: 5px;
+  padding: 1.0px 2.0px 0.42em 2.0em;
+  background: orange;
+ 
+`
+
+
+const StyledDiv1 = styled.div`
+  border: 8px solid grey;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: left;
+  border-radius: 20px;
+  background: #C2C5BB;
+  max-width: 550px;
+`
+
+const pStyle = {
+  fontSize: '15px',
+  textAlign: 'center'
+};
+
+const fakeDb = () =>{
+  return "8";  
+}
+
+// added white space 
+const option  = `\u00A0`;
+const option2  = `\u0020`;
+
+// added white space 
+const whitesp1  = `\u00A0`;
+const whitesp2  = `\u0020`;
+
+// Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAZcf97c40i_AV7Ge5OBHEce7P8HLD11YA",
+    authDomain: "stopwatchproject-bb7f4.firebaseapp.com",
+    databaseURL: "https://stopwatchproject-bb7f4.firebaseio.com",
+    projectId: "stopwatchproject-bb7f4",
+    storageBucket: "stopwatchproject-bb7f4.appspot.com",
+    messagingSenderId: "731232086655"
+  };
+  firebase.initializeApp(config);
+
+//   Local Storeage persistance
+//  only work for Window NOT iOS MacBook !!!
+
+const storeageAvailable = (type) => {
+  try {
+    // talk to the local storeage area
+    const storeage = window[type],
+          x= '_______storeage_test________';
+    // try putting s into local Storeage
+    storeage.setItem(x, x);
+    storeage.removeItem(x);
+    return true;
+  } catch(err){
+    // in case of failure
+    // treat the error like any error in the browser
+    return err instanceof DOMException &&(
+      err.code === 22 || 
+      err.code === 1014 ||
+      err.name === 'QuotaExceededError'  ||
+      err.name === 'NS_ERROR_COM_QUOTA_REACHED') &&
+      storeage.length !== 0;
+  }
+}
+
+
+const TimerOutofStoreage =() => {
+  console.log("Place timer out Storeage");
+  if (storeageAvailable('localStoreage')){
+    const timer = window.localStoreage.getItem('timer');
+    return timer || 0;
+  } else {
+    return 0;
+  }
+}
+
+const TimerIntoStorage =(interval=1) => {
+  
+  console.log("Take timer into of Storeage")
+  if (storeageAvailable('localStoreage')){
+    const timer = Number(window.localStorage.getItem('timer')) || 0;
+    let newTimer = timer + interval;    
+    if (interval > 1){
+      newTimer = interval  
+    }
+ // increasing current total
+    window.localStorage.setItem('timer', newTimer);
+    console.log(timer);
+  }
+}
+
+
+
+
+
+
+//  stateful or smart component
+// tracks the authentication state (Boolean)
+class AuthenData extends React.Component {
+  constructor(props){
+    super(props);
+    // set the default state
+     this.state={
+       authenticated: 1   // or use true
+       //name: "Joseph"
+    }
+  }
+  
+  componentWillMount(){
+    // talk to the datbase
+    
+    this.initAuthen();
+    // setState
+   // this.setState({authenticated: 1})
+    
+  }
+  
+  // 1   start listening to firebase authentication
+  initAuthen(){
+    console.log("Start listening to firebase aut")
+    firebase.auth().onAuthStateChanged(
+     user=>{
+       console.log("Auth state has changed");
+       if (user) {
+         console.log("Person is authenticated");
+         this.setState({authenticated: 1, email: null, psw: null});
+       } else { console.log("User NOT authenticated!!");
+              this.setState({authenticated: 0})
+              }   
+     }  //  end user
+    )
+  }
+  
+  // anytime the person provide input
+  onValueChanged(event){
+    console.log(event.target.value);
+    this.setState({[event.target.name]: event.target.value 
+                  })
+    const validity = event.target.validity;
+    console.log(validity);
+    
+    if(!validity.valid){
+      this.setState({
+        errors: {[event.target.name+"Error"]: true}
+      })
+    }else{
+      this.setState({
+        errors: {[event.target.name+"Error"]: false}
+      })
+    }
+    
+    
+  }
+  
+  onSubmit(evt){
+    evt.preventDefault();
+    console.log(this.stae);
+    this.register();
+  }
+  
+ //  register a new user  
+  register(){
+        evt.preventDefault();
+    firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.psw).then( ()=>{/// it suceed
+    console.log("Suceed logging into Firebase")
+    }).catch( (err)=>{
+      console.log("Register Fail: ")
+      console.log(err);
+      alert(err.message);
+    });
+    
+  }
+  
+  
+  //3.  login a registered user
+  login(evt){
+        evt.preventDefault();
+        console.log("In login" + this.state.email + "   psw: " + this.state.psw)
+       firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.psw).then( ()=>{/// it suceed
+  //   firebase.auth().signInWithEmailAndPassword(user.emails, user.password);      
+         
+    console.log("Suceed logging into Firebase")
+    }).catch( (err)=>{
+      console.log("Register Fail: ")
+      console.log(err);
+      alert(err.message);
+    });
+    
+  }
+  
+  //   logout an authenticated user
+  logout(){
+    firebase.auth().signOut();
+    
+  }
+  
+  renderChildren(children){
+    return React.Children.map(children, child=>{
+      if (child.props.authenticationRequired && !this.state.authenticated){
+         return(
+    <RegisterLogin authenticated={this.state.authenticated} name={this.state.name}  email={this.state.email}  action={this.onValueChanged.bind(this)}  psw={this.state.psw}  submit={this.onSubmit.bind(this)}  exit={this.logout.bind(this)}  login={this.login.bind(this)}      />) }  
+      
+        const cloned = React.cloneElement(child, {
+        authenticated: this.state.authenticated,
+        logout: this.logout.bind(this)
+        
+      })
+      return cloned;
+    })
+    
+  }
+ 
+  
+  
+  render(){
+  //return(null);  
+    return(
+      <div>
+        {this.renderChildren(this.props.children)}
+        </div>)
+  }  
+}
+
+
+const RegisterLogin = (props) =>{
+  
+  let fields; 
+
+    fields=<div>     
+        <h2>Please lock IN to continue </h2> 
+         {whitesp1}  {whitesp1} 
+        <form>
+          <StyledDiv1>
+          {whitesp1}   
+          <label>
+                
+             {whitesp1}   {whitesp1}  {whitesp1} Email:   {whitesp1}  {whitesp1} 
+            <input type="text" name="email" onChange={props.action}  value={props.email} required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" />
+            </label>
+             {whitesp1}  {whitesp1} 
+          </StyledDiv1>
+             {whitesp1}  {whitesp1}           
+          <StyledDiv1>
+              {whitesp1}   
+              <label>
+              {whitesp1}   {whitesp1}  {whitesp1} Paaword:  {whitesp1} 
+            <input type="password" name="psw" onChange={props.action}  value={props.psw} required pattern=".{6,}"  />
+            </label>
+             {whitesp1}  {whitesp1} 
+          </StyledDiv1>
+          <p>
+             {whitesp1}  {whitesp1} 
+              {whitesp1}  {whitesp1}    
+          </p>
+              {whitesp1}  {whitesp1}
+           <StyledButton onClick={props.submit} type="submit" >Register</StyledButton>
+          {whitesp1}  {whitesp1}  {whitesp1} 
+            <StyledButton onClick={props.login} type="login" >Log In</StyledButton>        
+        </form>
+        </div>
+  return(
+  <div className="makeItRed">
+    
+      {fields}
+    </div>
+  )  
+
+}
+
+
+// ========  Stop Watch ==============================
+
+class StopWatchData extends React.Component {
+  constructor(){
+    super();
+    console.log("I am conceived , but chica wo wow..")
+    this.state={
+      timer: 1
+    }  
+  }
+  
+  componentWillMount(){
+    this.initialData();
+    console.log("I am on screen");
+    clearInterval(this.tiktoc);
+   // getTime();
+    let datestamp;
+     let currentdate = new Date();
+    this.setState({datestamp: currentdate});
+    console.log("add date stamp: " + currentdate);
+    // bad way
+    //this.state={
+    //  coffeeDrinks: 7
+    // }
+    // setState allow React LifeCycle to be alert and manage the change
+    //this.coffeeDrinks = 5;
+    // this.state({coffeeDrinks: functionName()})
+  // this.setState(
+   // {timer: 16}, function(){console.log(this.state);}
+     this.setState({timer: TimerOutofStoreage()}, function(){console.log("timer 2" + this.state)});
+     
+  }
+  
+initialData(){
+      //  read from the database
+firebase.database().ref('Watch').on('value', (snapshot)=>{
+  console.log("Connected to database");
+  console.log(snapshot.val());
+
+ const dbTimer = snapshot.val().watchTime || 0;
+  const localTimer = TimerOutofStoreage();
+  
+  if (dbTimer > localTimer) {
+    // update local total
+    TimerIntoStorage(dbTimer);
+    console.log("Updated dbTimer");
+  } else if (localTimer > dbTimer) {
+    // update dbase  - we were offline
+    firebase.database().ref('Watch').set({watchTime: localTimer});
+  } else if (localTimer == dbTimer ){
+    console.log(" You are synced to Dbase ")
+  }
+  
+  //   did we get any data?  
+  if(snapshot){
+    let data = snapshot.val();
+    this.setState({timer: data.watchTime})
+    //this.setState( snapshot.val());
+  } 
+})
+    
+} // end initialData
+  
+  tick () {
+    this.setState({timer: (this.state.timer + 1)})
+  }
+  
+  
+  TimerStart(){
+    //alert("Start My Timer");
+    //  update the state 
+    //  state.total + = total;  will not get state into react
+    
+    //  connect & update DataBase
+    //firebase.database().ref('Watch').set({watchTime: 13});
+    let temp = Number(this.state.timer);
+    this.setState({timer: temp+1}, ()=> {
+    firebase.database().ref('Watch').set({watchTime: this.state.timer});  
+      TimerIntoStorage()
+     });  
+    
+     clearInterval(this.tiktoc)
+    this.tiktoc = setInterval(this.tick.bind(this), 1000)
+  }
+  
+  TimerStop(){
+    alert("Stop My Timer");
+    //  update the state    
+     clearInterval(this.tiktoc);
+    //  connect & update DataBase
+    //firebase.database().ref('Watch').set({watchTime: 13});
+  }
+  
+ ResetTimer(){
+    //  update the state 
+    clearInterval(this.tiktoc);
+    //this.setState({tiktoc: 1});
+    this.setState({timer: 0}); 
+       alert("Reset My Timer");
+   const test = this.state.datestamp;
+       console.log("Reset date stamp: " + test);
+    //  connect & update DataBase
+    //firebase.database().ref('Watch').set({watchTime: 13});
+  }
+    
+    
+  render(){
+  return(
+    <div>
+      <MenuBar  logmeout={this.logout} />
+      <p> {option} </p>
+      <UI  total={this.state.timer} actStart={this.TimerStart.bind(this)}  
+        Bstop={this.TimerStop.bind(this)} Rtimer={this.ResetTimer.bind(this)}   />  
+
+  </div>
+    //   actStart={this.TimerStart.bind(this)} no  () after TimerStart we just want the funtion awareness but not executed
+  )
+  }
+}
+
+const DateComp = (props) =>{
+  const formdate = (event) =>{
+    //console.log("Satrt drinking coffee" + {props});
+    //props.action();
+  }
+   return (
+ <div className="alarm-clock">
+	<div className="date">
+		<span className="month">Date details</span>
+		<span className="day"></span>,
+		<span className="year"></span>
+	</div>
+
+	<div className="time">
+		<span className="hours"></span>
+		<span className="colon">:</span>
+		<span className="minutes"></span>
+		<span className="colon">:</span>
+		<span className="seconds"></span>
+	</div>
+</div>
+   )
+}
+
+
+const StartButton = (props) =>{
+  const treatMe = (event) =>{
+    //console.log("Satrt drinking coffee" + {props});
+    props.action();
+  }
+   return (
+   <StyledButton className="watchButton" onClick={treatMe}>{props.label} </StyledButton>
+   )
+}
+
+const StopButton = (props) =>{
+  const testMe = (event) =>{
+    props.actonB();
+    //alert("Stop drinking coffee");
+  }
+   return (
+   <StyledButton className="watchButton" onClick={testMe}>{props.label} </StyledButton>
+   )
+}
+
+ const ResetButton = (props) =>{
+  const ResetMe = (event) =>{  
+      //  ----  stop timer & place timer into storeage ***
+      //let temp2= Time(this.state.timer);
+    props.reset2(); 
+  
+   // this.setState({tiktoc: 1});
+   // clearInterval(this.timer);
+
+   // this.setState({timer: 0});  
+    //console.log("reset timer:  " + this.state.timer + "more "+ props.timer);   
+  }
+   return (
+   <StyledButton className="watchButton" onClick={ResetMe}>{props.label} </StyledButton>
+   )
+}
+
+ const MenuBar = (props) =>{
+    const logmeout = (event) =>{
+    props.logout.bind(this);
+    //alert("Stop drinking coffee");
+  }
+  return(
+   <div className="dropdown">
+            <p> &#160; </p>
+
+            <p> &nbsp; </p>
+            <p> &#160; </p>  
+  <StyledMeun5 id="myDropdown" className="dropdown-content" >
+    <div>
+    <ul >
+      <li><a style={pStyle} href="https://www.w3schools.com/html/">Link 1</a></li>
+      <li><a style={pStyle} href="https://www.google.com/">Link 2</a></li>
+      <li><a style={pStyle} href="https://www.facebook.com/">Link 3</a></li>
+    </ul>
+    </div>
+    <div>
+       <StyledButton   onClick={props.logmeout}>Log out</StyledButton>
+    </div>
+  </StyledMeun5>
+</div>
+  )
+}
+
+const UI = (props) =>{
+  return(
+  <div className="container">
+      <div className="innerContent">
+      <h4> Hi {props.name}  &#174; </h4>
+        <DateComp />
+            <p> &nbsp; </p>
+            <p> &#160; </p>  
+      <StyledH5>Tracking coffee comsumption </StyledH5>
+      <StyledH5> Total Coffee: {props.total} </StyledH5>
+        <p>  {option} </p>
+        <div className="alignButton">
+        <StartButton label="Start" action={props.actStart}/>   {option} {option}    
+        <StopButton label="Stop" actonB={props.Bstop} />  {option} {option}  
+        <ResetButton label="Reset" reset2={props.Rtimer} />
+              </div>
+        <p>  {option} </p>
+ 
+      </div>
+
+    </div>
+  ) 
+}
+
+
+// ====================================================
+
+
+class Greeting extends React.Component{
+  constructor(){
+    super();
+    
+  }
+  render(){
+  return (
+  <div> 
+            <StopWatchData  authenticationRequired   /> 
+      I'm In 
+        <p>  {option} </p>
+         <p>  {option} </p>
+      {option} {option}   {option} {option} 
+      <StyledButton   onClick={this.props.logout}>Log out</StyledButton>
+      {option} {option}   {option} {option} 
+    </div>
+  )
+  }
+}
+
+const AuthicatedProvider = props =>{
+  return (
+    <div>
+
+  <AuthenData>
+      <Greeting authenticationRequired  />
+
+      </AuthenData>
+
+      </div>
+  )
+  
+}
+
+
+ ReactDOM.render(<AuthicatedProvider />, document.querySelector('#app'));
+
+//ReactDOM.render(<Messages messages={messages}  />, document.querySelector('#app'));
+
