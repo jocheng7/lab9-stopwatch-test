@@ -257,7 +257,7 @@ var RegisterLogin = function RegisterLogin(props) {
     React.createElement(
       'h2',
       null,
-      'Please lock IN to continue '
+      'Please lock into database to continue '
     ),
     whitesp1,
     '  ',
