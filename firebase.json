@@ -1,8 +1,8 @@
 {
-  “hosting”:{
-	“public”: “.”,
-	“ignore”: [
-		“firebase,json”
+  "hosting”:{
+    "public": ".",
+    "ignore": [
+		“firebase.json”
             ]
 }
 }
